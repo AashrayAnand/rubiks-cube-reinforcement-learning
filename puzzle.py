@@ -40,12 +40,13 @@ class State:
         new_State = State(c=sides)
         return new_State
 
+    # equality tested for cube
     def eq(self, other):
         return self.__left__ == other.left() and self.__right__ == other.right()\
                 and self.__top__ == other.top() and self.__bottom__ == other.bottom()\
                 and self.__front__ == other.front() and self.__back__ == other.back()
-    # cube is represented in side order:
-    # front, back, left, right, top, bottom
+
+    # getters for cube sides
     def left(self):
         return self.__left__
     def right(self):
@@ -58,10 +59,13 @@ class State:
         return self.__front__
     def back(self):
         return self.__back__
+
+    # stringify a cube
     def __str__(self):
         return "\nFRONT" + str(self.__front__) + "\nBACK" + str(self.__back__) + "\nLEFT" \
         + str(self.__left__) + "\nRIGHT" + str(self.__right__) + "\nTOP" + str(self.__top__) + "\nBOTTOM" + str(self.__bottom__)
     
+    # execute a 180 degreee clockwise rotation of a given side
     def rotate_side(self, side):
         new_side = [[],[],[]]
         for i in reversed(range(self.size)):
@@ -69,18 +73,23 @@ class State:
                 new_side[self.size - 1 - i].append(side[i][self.size - 1 - y])
         return new_side
 
+    # modify a side, rotating its rows to columns, either in left to right
+    # or right to left order, depending on the reverse parameter
     def columns_to_rows(self, side, reverse=False):
         new_side = []
         for i in range(self.size):
             row = []
             for j in range(self.size):
+                # left to right order
                 if not reverse:
                     row.append(side[self.size - 1 - j][i])
+                # right to left order
                 else:
                     row.append(side[j][self.size - 1 - i])
             new_side.append(row)
         return new_side
 
+    # rotate the cube 90 degrees counter clockwise
     def rotate_cube(self):
         left_side = self.__left__
         self.__left__ = self.replace_side(self.__back__)
@@ -92,6 +101,7 @@ class State:
         self.__top__ = self.columns_to_rows(self.__top__, reverse=True)
         self.__bottom__ = self.columns_to_rows(self.__bottom__)   
     
+    # swap the first row of two given sides, in place
     def swap_first_row(self, side1, side2):
         s1_1 = side1[0]
         s2_1 = side2[0]
@@ -108,12 +118,16 @@ class State:
             side1[i][self.size - 1], side2[i][0] =  side2[i][0], side1[i][self.size - 1]
         return side1, side2
 
+    # given a new side, return a copy of this side, 
+    # to replace a given side of a cube
     def replace_side(self, side):
         new_side = []
         for row in side:
             new_side.append(row)
         return new_side
     
+    # flip cube forward, from perspective of user looking at front
+    # flipping such that front goes to bottom and top comes to front
     def flip_forward(self):
         front = self.__front__
         self.__front__ = self.replace_side(self.__top__)
@@ -123,6 +137,8 @@ class State:
         self.__back__ = self.replace_side(bottom)
         self.__top__ = self.replace_side(back)
     
+    # flip cube backward, from perspective of user looking at front
+    # flipping such that front goes to top and bottom goes to front
     def flip_backward(self):
         front = self.__front__
         self.__front__ = self.replace_side(self.__bottom__)
@@ -132,7 +148,8 @@ class State:
         self.__back__ = self.replace_side(top)
         self.__bottom__ = self.replace_side(back)
     
-    
+    # flip cube, either forward or backward, and invert
+    # sides that must be inverted as a result
     def flip_cube(self, forward=False):
         # if flipping forward, we set front to be top
         # top to be back, back to be bottom, and bottom
@@ -171,6 +188,9 @@ class State:
     def turn_back(self):
         # swap the last row of the left/right sides, and the first
         # row of the top/bottom sides
+        # must rotate 90 degress twice
+        self.rotate_cube()
+        self.rotate_cube()
         self.turn_front
 
     
@@ -179,7 +199,7 @@ class State:
         # top gets rotated 90 degrees counter clockwise 
         # (3 6 9 -> 1 2 3) (2 5 8 -> 4 5 6) (1 4 7 -> 7 8 9)
 
-        # turn the cube 90 degrees counter clockwise to face the
+        # must turn the cube 90 degrees counter clockwise to face the
         # left side of the cube, now as the front, then turn_front
         self.rotate_cube()
         self.turn_front()
@@ -195,11 +215,11 @@ class State:
     
     def turn_top(self):
         self.flip_cube(forward=True)
-        self.__top__ = self.rotate_side(self.__top__)
+        self.turn_front()
     
     def turn_bottom(self):
         self.flip_cube()
-        self.__bottom__ = self.rotate_side(self.__bottom__)
+        self.turn_front()
 
     def isGoalState(self):
     # check if all 3 lists that make up a side are equal
