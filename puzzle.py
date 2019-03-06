@@ -1,17 +1,20 @@
 from random import shuffle
+import copy
 SIDES = 6
 # state object
 class State:
     def __init__(self, size=3, c=None):
         self.size = size
+        self.actions = ['front', 'back', 'left', 'right', 'top', 'bottom']
         if c:
+            self.d = c
             self.__front__ = c["front"]
             self.__back__ = c["back"]
             self.__left__ = c["left"]
             self.__right__ = c["right"]
             self.__top__ = c["top"]
             self.__bottom__ = c["bottom"]
-            self.__sides__ = [self.__front__, self.__back__, self.__left__, self.__right__, self.__top__, self.__bottom__]
+            self.__sides__ = [self.front(), self.back(), self.left(), self.right(), self.top(), self.bottom()]
             return
         # create array of values 1-6 for different colors
         # and multiply by number of pieces per size to get
@@ -31,14 +34,14 @@ class State:
         self.__top__ = [top[i:i + size] for i in range(0,len(front), size)]
         bottom, nums = nums[0:size**2],nums[size**2:]
         self.__bottom__ = [bottom[i:i + size] for i in range(0,len(front), size)]
-        self.__sides__ = [self.__front__, self.__back__, self.__left__, self.__right__, self.__top__, self.__bottom__]
-
+        self.__sides__ = [self.front(), self.back(), self.left(), self.right(), self.top(), self.bottom()]
+        self.d = {"front": self.front(), "back": self.back(), "left": self.left(),\
+                    "right": self.right(), "top": self.top(), "bottom": self.bottom()}
     # return new copy of State
     def copy(self):
-        sides = {"front": self.__front__, "back": self.__back__, "left": self.__left__,\
-                 "right": self.__right__, "top": self.__top__, "bottom": self.__bottom__}
-        new_State = State(c=sides)
-        return new_State
+        #d = copy.deepcopy(self.d)
+        new_s = copy.deepcopy(self)
+        return new_s
 
     # equality tested for cube
     def eq(self, other):
@@ -46,26 +49,38 @@ class State:
                 and self.__top__ == other.top() and self.__bottom__ == other.bottom()\
                 and self.__front__ == other.front() and self.__back__ == other.back()
 
-    # getters for cube sides
+    # getters and setters for cube sides
     def left(self):
         return self.__left__
+    def set_left(self, l):
+        self.__left__ = l
     def right(self):
         return self.__right__
+    def set_right(self, r):
+        self.__right__ = r
     def top(self):
         return self.__top__
+    def set_top(self, t):
+        self.__top__ = t
     def bottom(self):
         return self.__bottom__
+    def set_bottom(self, b):
+        self.__bottom__ = b
     def front(self):
         return self.__front__
+    def set_front(self, f):
+        self.__front__ = f
     def back(self):
         return self.__back__
+    def set_back(self, b):
+        self.__back__ = b
 
     # stringify a cube
     def __str__(self):
         return "\nFRONT" + str(self.__front__) + "\nBACK" + str(self.__back__) + "\nLEFT" \
         + str(self.__left__) + "\nRIGHT" + str(self.__right__) + "\nTOP" + str(self.__top__) + "\nBOTTOM" + str(self.__bottom__)
     
-    # execute a 180 degreee clockwise rotation of a given side
+    # execute a 180 degreee rotation of a given side
     def rotate_side(self, side):
         new_side = [[],[],[]]
         for i in reversed(range(self.size)):
@@ -162,10 +177,14 @@ class State:
             self.flip_forward()
             self.__front__ = self.rotate_side(self.__front__)
             self.__back__ = self.rotate_side(self.__back__)
+            self.__left__ = self.columns_to_rows(self.__left__)
+            self.__right__ = self.columns_to_rows(self.__right__, reverse=True)
         else:
             self.flip_backward()
             self.__top__ = self.rotate_side(self.__top__)
             self.__bottom__ = self.rotate_side(self.__bottom__)
+            self.__left__ = self.columns_to_rows(self.__left__, reverse=True)
+            self.__right__ = self.columns_to_rows(self.__right__)
 
 
     # current move constraints: can only move clockwise
@@ -226,10 +245,27 @@ class State:
     # for every side, return false if this is not the case
     # e.g. side = [[1,1,1], [1,1,1], [1,1,2]]
         for side in self.__sides__:
-            num = side[0][0]
+            char = side[0][0]
             # check if all values in each row are equal
             # to the first value
             for row in side:
-                if not num == row[0] == row[1] == row[2]:
+                if not char == row[0] == row[1] == row[2]:
                     return False
         return True
+    
+def move(s, action):
+    new_state = s.copy()
+    if action == 'left':
+        new_state.turn_left()
+    elif action == 'right':
+        new_state.turn_right()
+    elif action == 'front':
+        new_state.turn_front()
+    elif action == 'back':
+        new_state.turn_back()
+    elif action == 'top':
+        new_state.turn_top()
+    elif action == 'bottom':
+        new_state.turn_bottom()
+    new_state.__sides__ = [new_state.front(), new_state.back(), new_state.left(), new_state.right(), new_state.top(), new_state.bottom()]
+    return new_state
