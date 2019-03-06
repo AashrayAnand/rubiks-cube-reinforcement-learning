@@ -5,12 +5,13 @@ class State:
     def __init__(self, size=3, c=None):
         self.size = size
         if c:
-            self.front = c.front
-            self.back = c.back
-            self.left = c.left
-            self.right = c.right
-            self.top = c.top
-            self.bottom = c.bottom
+            self.front = c["front"]
+            self.back = c["back"]
+            self.left = c["left"]
+            self.right = c["right"]
+            self.top = c["top"]
+            self.bottom = c["bottom"]
+            self.sides = [self.front, self.back, self.left, self.right, self.top, self.bottom]
             return
         # create array of values 1-6 for different colors
         # and multiply by number of pieces per size to get
@@ -30,6 +31,7 @@ class State:
         self.top = [top[i:i + size] for i in range(0,len(front), size)]
         bottom, nums = nums[0:size**2],nums[size**2:]
         self.bottom = [bottom[i:i + size] for i in range(0,len(front), size)]
+        self.sides = [self.front, self.back, self.left, self.right, self.top, self.bottom]
 
 
     # cube is represented in side order:
@@ -177,13 +179,15 @@ class State:
         self.flip_cube()
         self.bottom = self.rotate_side(self.bottom)
 
-
-x = State()
-print(x)
-top_row = x.front[0]
-print()
-x.turn_front()
-bot_row = x.front[x.size - 1]
-print(x)
-
-#def move(s, a):
+    def isGoalState(self):
+    # check if all 3 lists that make up a side are equal
+    # for every side, return false if this is not the case
+    # e.g. side = [[1,1,1], [1,1,1], [1,1,2]]
+        for side in self.sides:
+            num = side[0][0]
+            # check if all values in each row are equal
+            # to the first value
+            for row in side:
+                if not num == row[0] == row[1] == row[2]:
+                    return False
+        return True

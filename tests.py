@@ -51,10 +51,50 @@ class TestRotations(unittest.TestCase):
         # check first bot row move to first top row
         self.assertTrue(compare(bot_first_row, top_first_row2))
         # check third col of left move to first col of right
-        self.assertTrue(compareReverse(left_third_col, right_first_col2))
+        self.assertTrue(compare(left_third_col, right_first_col2))
         # check first col of right move to third col of left
-        self.assertTrue(compareReverse(right_first_col, left_third_col2))
+        self.assertTrue(compare(right_first_col, left_third_col2))
+    
+    # test 90 degree counter clockwise cube rotation works
+    def test_cube_rotation(self):
+        cube = State()
+        left = cube.left
+        right = cube.right
+        back = cube.back
+        front = cube.front
+        top = cube.top
+        top_r1 = top[0]
+        top_r2 = top[1]
+        top_r3 = top[2]
+        bottom = cube.bottom
+        bot_r1 = bottom[0]
+        bot_r2 = bottom[0]
+        bot_r3 = bottom[0]
+        print(cube)
+        cube.rotate_cube()
+        # check each original side is equal to what is now 90 degrees CC
+        self.assertTrue(left == cube.front)
+        self.assertTrue(front == cube.right)
+        self.assertTrue(right == cube.back)
+        self.assertTrue(back == cube.left)
+        print(cube)
+        self.assertTrue(compareReverse(top_r1,[cube.top[0][0],cube.top[1][0],cube.top[2][0]]))
+        self.assertTrue(compareReverse(top_r2,[cube.top[0][1],cube.top[1][1],cube.top[2][1]]))
+        self.assertTrue(compareReverse(top_r3,[cube.top[0][2],cube.top[1][2],cube.top[2][2]]))
 
+class TestGoalState(unittest.TestCase):
+
+    # check that goal state returns true when we call isGoalState    
+    def testIsSolvedState(self):
+        c = {"front": [[1,1,1],[1,1,1],[1,1,1]], "back": [[2,2,2],[2,2,2],[2,2,2]], "top": [[3,3,3],[3,3,3],[3,3,3]], "bottom": [[4,4,4],[4,4,4],[4,4,4]], "left": [[5,5,5],[5,5,5],[5,5,5]], "right": [[6,6,6],[6,6,6],[6,6,6]]}
+        cube = State(c=c)
+        self.assertTrue(cube.isGoalState())
+    
+    # check that non goal state returns false when we call isGoalState
+    def testIsNotSolvedState(self):
+        c = {"front": [[1,1,1],[1,2,1],[1,2,1]], "back": [[2,2,3],[2,3,2],[2,2,3]], "top": [[3,3,3],[3,3,3],[3,3,3]], "bottom": [[4,4,4],[4,4,4],[4,4,4]], "left": [[5,5,5],[5,5,5],[5,5,5]], "right": [[6,6,6],[6,6,6],[6,6,6]]}
+        cube = State(c=c)
+        self.assertFalse(cube.isGoalState())
 
 if __name__ == "__main__":
     unittest.main()
