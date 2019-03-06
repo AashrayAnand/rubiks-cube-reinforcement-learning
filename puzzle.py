@@ -5,13 +5,13 @@ class State:
     def __init__(self, size=3, c=None):
         self.size = size
         if c:
-            self.front = c["front"]
-            self.back = c["back"]
-            self.left = c["left"]
-            self.right = c["right"]
-            self.top = c["top"]
-            self.bottom = c["bottom"]
-            self.sides = [self.front, self.back, self.left, self.right, self.top, self.bottom]
+            self.__front__ = c["front"]
+            self.__back__ = c["back"]
+            self.__left__ = c["left"]
+            self.__right__ = c["right"]
+            self.__top__ = c["top"]
+            self.__bottom__ = c["bottom"]
+            self.__sides__ = [self.__front__, self.__back__, self.__left__, self.__right__, self.__top__, self.__bottom__]
             return
         # create array of values 1-6 for different colors
         # and multiply by number of pieces per size to get
@@ -20,25 +20,47 @@ class State:
         # shuffle numbers
         shuffle(nums)
         front, nums = nums[0:size**2],nums[size**2:]
-        self.front = [front[i:i + size] for i in range(0,len(front), size)]
+        self.__front__ = [front[i:i + size] for i in range(0,len(front), size)]
         back, nums = nums[0:size**2],nums[size**2:]
-        self.back = [back[i:i + size] for i in range(0,len(front), size)]
+        self.__back__ = [back[i:i + size] for i in range(0,len(front), size)]
         left, nums = nums[0:size**2],nums[size**2:]
-        self.left = [left[i:i + size] for i in range(0,len(front), size)]
+        self.__left__ = [left[i:i + size] for i in range(0,len(front), size)]
         right, nums = nums[0:size**2],nums[size**2:]
-        self.right = [right[i:i + size] for i in range(0,len(front), size)]
+        self.__right__ = [right[i:i + size] for i in range(0,len(front), size)]
         top, nums = nums[0:size**2],nums[size**2:]
-        self.top = [top[i:i + size] for i in range(0,len(front), size)]
+        self.__top__ = [top[i:i + size] for i in range(0,len(front), size)]
         bottom, nums = nums[0:size**2],nums[size**2:]
-        self.bottom = [bottom[i:i + size] for i in range(0,len(front), size)]
-        self.sides = [self.front, self.back, self.left, self.right, self.top, self.bottom]
+        self.__bottom__ = [bottom[i:i + size] for i in range(0,len(front), size)]
+        self.__sides__ = [self.__front__, self.__back__, self.__left__, self.__right__, self.__top__, self.__bottom__]
 
+    # return new copy of State
+    def copy(self):
+        sides = {"front": self.__front__, "back": self.__back__, "left": self.__left__,\
+                 "right": self.__right__, "top": self.__top__, "bottom": self.__bottom__}
+        new_State = State(c=sides)
+        return new_State
 
+    def eq(self, other):
+        return self.__left__ == other.left() and self.__right__ == other.right()\
+                and self.__top__ == other.top() and self.__bottom__ == other.bottom()\
+                and self.__front__ == other.front() and self.__back__ == other.back()
     # cube is represented in side order:
     # front, back, left, right, top, bottom
+    def left(self):
+        return self.__left__
+    def right(self):
+        return self.__right__
+    def top(self):
+        return self.__top__
+    def bottom(self):
+        return self.__bottom__
+    def front(self):
+        return self.__front__
+    def back(self):
+        return self.__back__
     def __str__(self):
-        return "\nFRONT" + str(self.front) + "\nBACK" + str(self.back) + "\nLEFT" \
-        + str(self.left) + "\nRIGHT" + str(self.right) + "\nTOP" + str(self.top) + "\nBOTTOM" + str(self.bottom)
+        return "\nFRONT" + str(self.__front__) + "\nBACK" + str(self.__back__) + "\nLEFT" \
+        + str(self.__left__) + "\nRIGHT" + str(self.__right__) + "\nTOP" + str(self.__top__) + "\nBOTTOM" + str(self.__bottom__)
     
     def rotate_side(self, side):
         new_side = [[],[],[]]
@@ -60,15 +82,15 @@ class State:
         return new_side
 
     def rotate_cube(self):
-        left_side = self.left
-        self.left = self.replace_side(self.back)
-        front_side = self.front
-        self.front = self.replace_side(left_side)
-        right_side = self.right
-        self.right = self.replace_side(front_side)
-        self.back = self.replace_side(right_side)
-        self.top = self.columns_to_rows(self.top, reverse=True)
-        self.bottom = self.columns_to_rows(self.bottom)   
+        left_side = self.__left__
+        self.__left__ = self.replace_side(self.__back__)
+        front_side = self.__front__
+        self.__front__ = self.replace_side(left_side)
+        right_side = self.__right__
+        self.__right__ = self.replace_side(front_side)
+        self.__back__ = self.replace_side(right_side)
+        self.__top__ = self.columns_to_rows(self.__top__, reverse=True)
+        self.__bottom__ = self.columns_to_rows(self.__bottom__)   
     
     def swap_first_row(self, side1, side2):
         s1_1 = side1[0]
@@ -93,22 +115,22 @@ class State:
         return new_side
     
     def flip_forward(self):
-        front = self.front
-        self.front = self.replace_side(self.top)
-        bottom = self.bottom
-        self.bottom = self.replace_side(front)
-        back = self.back
-        self.back = self.replace_side(bottom)
-        self.top = self.replace_side(back)
+        front = self.__front__
+        self.__front__ = self.replace_side(self.__top__)
+        bottom = self.__bottom__
+        self.__bottom__ = self.replace_side(front)
+        back = self.__back__
+        self.__back__ = self.replace_side(bottom)
+        self.__top__ = self.replace_side(back)
     
     def flip_backward(self):
-        front = self.front
-        self.front = self.replace_side(self.bottom)
-        top = self.top
-        self.top = self.replace_side(front)
-        back = self.back
-        self.back = self.replace_side(top)
-        self.bottom = self.replace_side(back)
+        front = self.__front__
+        self.__front__ = self.replace_side(self.__bottom__)
+        top = self.__top__
+        self.__top__ = self.replace_side(front)
+        back = self.__back__
+        self.__back__ = self.replace_side(top)
+        self.__bottom__ = self.replace_side(back)
     
     
     def flip_cube(self, forward=False):
@@ -121,12 +143,12 @@ class State:
         # back, we must then invert the top and bottom
         if forward:
             self.flip_forward()
-            self.front = self.rotate_side(self.front)
-            self.back = self.rotate_side(self.back)
+            self.__front__ = self.rotate_side(self.__front__)
+            self.__back__ = self.rotate_side(self.__back__)
         else:
             self.flip_backward()
-            self.top = self.rotate_side(self.top)
-            self.bottom = self.rotate_side(self.bottom)
+            self.__top__ = self.rotate_side(self.__top__)
+            self.__bottom__ = self.rotate_side(self.__bottom__)
 
 
     # current move constraints: can only move clockwise
@@ -140,11 +162,11 @@ class State:
 
     def turn_front(self):
         # invert the front side
-        self.front = self.rotate_side(self.front)
+        self.__front__ = self.rotate_side(self.__front__)
         # swap the first row of the left/right side, and swap 
         # the last column of the left side with the first column of the right side
-        self.top, self.bottom = self.swap_first_row(self.top, self.bottom)
-        self.left, self.right = self.swap_first_last_col(self.left, self.right)
+        self.__top__, self.__bottom__ = self.swap_first_row(self.__top__, self.__bottom__)
+        self.__left__, self.__right__ = self.swap_first_last_col(self.__left__, self.__right__)
         
     def turn_back(self):
         # swap the last row of the left/right sides, and the first
@@ -169,21 +191,21 @@ class State:
         self.rotate_cube()
         self.rotate_cube()
         self.rotate_cube()
-        self.right = self.rotate_side(self.right)
+        self.__right__ = self.rotate_side(self.__right__)
     
     def turn_top(self):
         self.flip_cube(forward=True)
-        self.top = self.rotate_side(self.top)
+        self.__top__ = self.rotate_side(self.__top__)
     
     def turn_bottom(self):
         self.flip_cube()
-        self.bottom = self.rotate_side(self.bottom)
+        self.__bottom__ = self.rotate_side(self.__bottom__)
 
     def isGoalState(self):
     # check if all 3 lists that make up a side are equal
     # for every side, return false if this is not the case
     # e.g. side = [[1,1,1], [1,1,1], [1,1,2]]
-        for side in self.sides:
+        for side in self.__sides__:
             num = side[0][0]
             # check if all values in each row are equal
             # to the first value
