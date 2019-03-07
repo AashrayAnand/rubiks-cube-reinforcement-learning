@@ -43,6 +43,7 @@ class State:
         new_s = copy.deepcopy(self)
         return new_s
 
+
     # equality tested for cube
     def eq(self, other):
         return self.__left__ == other.left() and self.__right__ == other.right()\
@@ -252,6 +253,33 @@ class State:
                 if not char == row[0] == row[1] == row[2]:
                     return False
         return True
+
+# check number of pieces on each side of cube that match color
+# of the middle piece of that side
+def num_pieces_correct_side(state):
+    correct = 0
+    for side in state.__sides__:
+        # get middle piece
+        color = side[int(state.size / 2)][int(state.size / 2)]
+        # subtract 1 to ignore middle cube
+        correct -= 1
+        for row in side:
+            # filter items in each row that equal middle color
+            # and add length of filtered list to total sum
+            correct += row.count(color)  
+    return correct
+
+def num_solved_sides(state):
+    solved = 0
+    for side in state.__sides__:
+        color = side[0][0]
+        # if number of pieces on this side equal to first square
+        # is number of total pieces, side is solved
+        if sum(row.count(color) for row in side) == state.size**2:
+            solved += 1
+            
+            
+    return solved
     
 def move(s, action):
     new_state = s.copy()

@@ -4,7 +4,7 @@
 # last row and new
  
 import unittest
-from puzzle import State
+from puzzle import State, num_pieces_correct_side, num_solved_sides
 
 def compareReverse(l1, l2):
     for i in range(len(l1)):
@@ -110,6 +110,17 @@ class TestEquality(unittest.TestCase):
         cube1 = State(c=c1)
         cube2 = State(c=c2)
         self.assertFalse(cube1.eq(cube2))
+    
+class TestRewardHelpers(unittest.TestCase):
+    def testCountSolvedSides(self):
+        c1 = {"front": [[1,1,1],[1,1,1],[1,1,1]], "back": [[2,2,2],[2,2,2],[2,2,2]], "top": [[3,3,3],[3,3,3],[3,3,3]], "bottom": [[4,4,4],[4,4,4],[4,4,4]], "left": [[5,5,5],[5,5,5],[5,5,5]], "right": [[6,6,6],[6,6,6],[6,6,6]]}
+        cube = State(c=c1)
+        self.assertTrue(num_solved_sides(cube) == 6)
+    
+    def testNumPiecesCorrectSide(self):
+        c1 = {"front": [[1,1,1],[1,1,1],[1,1,1]], "back": [[2,2,2],[2,2,2],[2,2,2]], "top": [[3,3,3],[3,3,3],[3,3,3]], "bottom": [[4,4,4],[4,4,4],[4,4,4]], "left": [[5,5,5],[5,5,5],[5,5,5]], "right": [[6,6,6],[6,6,6],[6,6,6]]}
+        cube = State(c=c1)
+        self.assertTrue(num_pieces_correct_side(cube) == 48)
 
 if __name__ == "__main__":
     unittest.main()
