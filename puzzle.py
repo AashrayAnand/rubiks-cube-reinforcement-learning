@@ -90,6 +90,9 @@ class State:
         return "\nFRONT" + str(self.__front__) + "\nBACK" + str(self.__back__) + "\nLEFT" \
         + str(self.__left__) + "\nRIGHT" + str(self.__right__) + "\nTOP" + str(self.__top__) + "\nBOTTOM" + str(self.__bottom__)
     
+    def __hash__(self):
+        return hash(self.__str__())
+
     # execute a 180 degreee rotation of a given side
     def rotate_side(self, side):
         new_side = [[],[],[]]
@@ -220,7 +223,9 @@ class State:
         # must rotate 90 degress twice
         self.rotate_cube()
         self.rotate_cube()
-        self.turn_front
+        self.turn_front()
+        self.rotate_cube()
+        self.rotate_cube()
 
     
     def turn_left(self):
@@ -232,6 +237,9 @@ class State:
         # left side of the cube, now as the front, then turn_front
         self.rotate_cube()
         self.turn_front()
+        self.rotate_cube()
+        self.rotate_cube()
+        self.rotate_cube()
 
     
     def turn_right(self):
@@ -240,15 +248,19 @@ class State:
         self.rotate_cube()
         self.rotate_cube()
         self.rotate_cube()
-        self.__right__ = self.rotate_side(self.__right__)
+        self.turn_front()
+        self.rotate_cube()
+
     
     def turn_top(self):
         self.flip_cube(forward=True)
         self.turn_front()
+        self.flip_cube()
     
     def turn_bottom(self):
         self.flip_cube()
         self.turn_front()
+        self.flip_cube(forward=True)
 
     def isGoalState(self):
     # check if all 3 lists that make up a side are equal
@@ -336,6 +348,11 @@ def ten_move_state():
     c.move(c.actions[1])
     c.move(c.actions[2])
     c.move(c.actions[3])
+    return c
+
+def one_move_state():
+    c = State()
+    c.move(c.actions[0])
     return c
 
 def shuffle(cube, n=5):
