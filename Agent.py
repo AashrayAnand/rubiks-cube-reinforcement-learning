@@ -31,7 +31,7 @@ class Agent:
         self.move = {"front": 0, "back": 0, "left": 0, "right": 0, "top": 0, "bottom": 0}
 
     # explore
-    def QLearn(self, discount=0.99, episodes=1000, epsilon=0.9):
+    def QLearn(self, discount=0.99, episodes=20, epsilon=0.9):
         # execute q learning for specified number of episodes
         self.curr_state = self.start_state
         for i in range(episodes):
@@ -205,10 +205,11 @@ class Agent:
     # run based on current policy
 
 agent = Agent()
-agent.QLearn()
-agent.QLearn()
-agent.QLearn()
-agent.QLearn()
+for i in range(500):
+    print("======= ROUND " + str(i) + "=========")
+    time.sleep(1)
+    agent.QLearn()
+print("there are " + str(len(agent.QV)) + " keys in Q Table")
 #agent.QLearn(epsilon=0.1)
 agent.Play()
 agent.printQV()
