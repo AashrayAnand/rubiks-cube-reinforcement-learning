@@ -1,6 +1,6 @@
-from random import shuffle
 import copy
 SIDES = 6
+import time
 # state object
 class State:
     def __init__(self, size=3, c=None):
@@ -19,7 +19,7 @@ class State:
         # create array of values 1-6 for different colors
         # and multiply by number of pieces per size to get
         # equal amount of each color (white. black, red, orange, green, yellow)
-        nums = ['W','B','R','O','G','Y']*(size**2)
+        '''nums = ['W','B','R','O','G','Y']*(size**2)
         # shuffle numbers
         shuffle(nums)
         front, nums = nums[0:size**2],nums[size**2:]
@@ -33,7 +33,13 @@ class State:
         top, nums = nums[0:size**2],nums[size**2:]
         self.__top__ = [top[i:i + size] for i in range(0,len(front), size)]
         bottom, nums = nums[0:size**2],nums[size**2:]
-        self.__bottom__ = [bottom[i:i + size] for i in range(0,len(front), size)]
+        self.__bottom__ = [bottom[i:i + size] for i in range(0,len(front), size)]'''
+        self.__front__ = [['W','W','W'],['W','W','W'],['W','W','W']]
+        self.__back__ = [['Y','Y','Y'],['Y','Y','Y'],['Y','Y','Y']]
+        self.__top__ = [['R','R','R'],['R','R','R'],['R','R','R']]
+        self.__bottom__ = [['O','O','O'],['O','O','O'],['O','O','O']]
+        self.__left__ = [['B','B','B'],['B','B','B'],['B','B','B']]
+        self.__right__ = [['G','G','G'],['G','G','G'],['G','G','G']]
         self.__sides__ = [self.front(), self.back(), self.left(), self.right(), self.top(), self.bottom()]
         self.d = {"front": self.front(), "back": self.back(), "left": self.left(),\
                     "right": self.right(), "top": self.top(), "bottom": self.bottom()}
@@ -75,6 +81,9 @@ class State:
         return self.__back__
     def set_back(self, b):
         self.__back__ = b
+
+    
+    # randomly shuffle cube (applies n moves)
 
     # stringify a cube
     def __str__(self):
@@ -254,6 +263,22 @@ class State:
                     return False
         return True
 
+
+    def move(self, action):
+        if action == 'left':
+            self.turn_left()
+        elif action == 'right':
+            self.turn_right()
+        elif action == 'front':
+            self.turn_front()
+        elif action == 'back':
+            self.turn_back()
+        elif action == 'top':
+            self.turn_top()
+        elif action == 'bottom':
+            self.turn_bottom()
+        self.__sides__ = [self.front(), self.back(), self.left(), self.right(), self.top(), self.bottom()]
+
 # check number of pieces on each side of cube that match color
 # of the middle piece of that side
 def num_pieces_correct_side(state):
@@ -280,7 +305,51 @@ def num_solved_sides(state):
             
             
     return solved
+
+def num_crosses(state):
+    crosses = 0
+    for side in state.__sides__:
+        color = side[1][1]
+        if side[0][1] == color and side[1][0] == color and side[1][2] == color and side[2][1] == color:
+            crosses += 1
+    return crosses
+
+def num_xs(state):
+    xs = 0
+    for side in state.__sides__:
+        color = side[1][1]
+        if side[0][0] == color and side[0][2] == color and side[2][0] == color and side[2][2] == color:
+            xs += 1
+    return xs
     
+import random
+
+def ten_move_state():
+    c = State()
+    c.move(c.actions[0])
+    c.move(c.actions[1])
+    c.move(c.actions[2])
+    c.move(c.actions[3])
+    c.move(c.actions[4])
+    c.move(c.actions[5])
+    c.move(c.actions[0])
+    c.move(c.actions[1])
+    c.move(c.actions[2])
+    c.move(c.actions[3])
+    return c
+
+def shuffle(cube, n=5):
+    new_cube = cube.copy()
+    for _ in range(5):
+        new_cube = random_move(new_cube)
+    return new_cube
+
+def random_move(cube):
+    action = random.choice(cube.actions)
+    print("executing " + action + " 180 rotation")
+    cube = move(cube, action)
+    return cube
+
 def move(s, action):
     new_state = s.copy()
     if action == 'left':
@@ -297,3 +366,11 @@ def move(s, action):
         new_state.turn_bottom()
     new_state.__sides__ = [new_state.front(), new_state.back(), new_state.left(), new_state.right(), new_state.top(), new_state.bottom()]
     return new_state
+
+
+# important features of a rubiks cube
+# num. solved sides, highest priority
+# num. of crosses
+# num. of x's
+# num. of pieces on correct sides
+# num. of vertical/horizontal lines
