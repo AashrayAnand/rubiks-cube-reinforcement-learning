@@ -1,8 +1,6 @@
 # Reinforcement Learning: Solving the Rubik's Cube
 
-### Aashray Anand & Ozan Erdal 
-
-*"A generally intelligent agent must be able to teach itself how to solve problems in complex domains with minimal human supervision." -S. McAleer"*
+##*"A generally intelligent agent must be able to teach itself how to solve problems in complex domains with minimal human supervision." -S. McAleer"*##
 
  This project is an attempt to represent and solve the classic Rubik's cube
 
@@ -33,3 +31,7 @@ to change the number of moves to apply to the initial cube, change **n=5** to an
 ### References:
 
 McAleer, Stephen. *Solving the Rubik's Cube without Human Knowledge*. https://arxiv.org/pdf/1805.07470.pdf
+
+Lapan, Max. *Reinforcement Learning to solve Rubik’s cube (and other complex problems!)*. https://medium.com/datadriveninvestor/reinforcement-learning-to-solve-rubiks-cube-and-other-complex-problems-106424cf26ff
+
+##### Created by: Aashray Anand & Ozan Erdal 
