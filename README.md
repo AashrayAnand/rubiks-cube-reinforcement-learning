@@ -14,7 +14,7 @@ currently can be up to 5 to find a goal state for each execution, or in the rang
 > **puzzle.py** includes the state representation of a Rubik's Cube, **State()**, as well as a few auxillary functions
 that are used elsewhere in the application
 
-> **tests.py** includes a variety of test cases that can be executed to confirm the valid implementation of the cube's state represention
+> **tests.py** and **others.py** includes a variety of test cases that can be executed to confirm the valid implementation of the cube's state represention
 
 > **Agent.py** includes the implementation of a reinforcement learning agent, which executes iterations of Q-Learning, and additionally uses a pattern database, to build up a Q-Table, which is used to eventually try to solve the given random Rubik's cube
 
