@@ -22,11 +22,11 @@ that are used elsewhere in the application
 
 clone the repository and verify you have python3 installed 
 
-` python Agent.py (will run Q-Learning on a n=5 scrambled cube, and attempt to solve it) `
+` >>> python Agent.py (will run Q-Learning on a n=5 scrambled cube, and attempt to solve it) `
 
 to change the number of moves to apply to the initial cube, change **n=5** to any value on the below line in Agent.py
 
-` 22    self.start_state = cube if cube is not None else n_move_state(n=5) `
+` 22 >>>    self.start_state = cube if cube is not None else n_move_state(n=5) `
 
 ### References:
 
