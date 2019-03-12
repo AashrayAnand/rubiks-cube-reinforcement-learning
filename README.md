@@ -1,6 +1,6 @@
 # Reinforcement Learning: Solving the Rubik's Cube
 
-##*"A generally intelligent agent must be able to teach itself how to solve problems in complex domains with minimal human supervision." -S. McAleer"*##
+## *"A generally intelligent agent must be able to teach itself how to solve problems in complex domains with minimal human supervision." -S. McAleer"*
 
  This project is an attempt to represent and solve the classic Rubik's cube
 
