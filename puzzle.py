@@ -336,15 +336,9 @@ def num_xs(state):
     
 import random
 
-def six_move_state():
+def n_move_state(n=5):
     c = State()
-    '''c.move(c.actions[0])
-    c.move(c.actions[1])
-    c.move(c.actions[1])
-    c.move(c.actions[3])
-    c.move(c.actions[4])
-    c.move(c.actions[5])'''
-    return shuffle(c, n=5)
+    return shuffle(c, n=n)
 
 def one_move_state():
     c = State()

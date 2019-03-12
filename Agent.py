@@ -1,5 +1,5 @@
 import random, time
-from puzzle import State, move, num_solved_sides, num_pieces_correct_side, shuffle, six_move_state, one_move_state
+from puzzle import State, move, num_solved_sides, num_pieces_correct_side, shuffle, n_move_state, one_move_state
 
 ALPHA = 0.6
 
@@ -19,7 +19,7 @@ class Agent:
         # can index list of rewards using directional class constants
         self.R = {}
         # create or store initial cube state, and store list of actions
-        self.start_state = cube if cube is not None else six_move_state() #six_move_state()
+        self.start_state = cube if cube is not None else n_move_state(n=6) 
         print(self.start_state)
         # shuffle initially solved starting state, executing 5 random moves
         # self.start_state = shuffle(self.start_state)
@@ -36,7 +36,6 @@ class Agent:
         self.four_away = []
         self.five_away = []
         self.six_away = []
-        self.seven_away = []
         self.last_action = None
         self.move = {"front": 0, "back": 0, "left": 0, "right": 0, "top": 0, "bottom": 0}
 
@@ -77,14 +76,18 @@ class Agent:
                 self.five_away.append(s_)
                 for action_ in self.actions:
                     self.QV[(s_.__hash__(), action_)] = -3 if action_ != action else 3
-
         
-        
+        for s in self.five_away:
+            for action in self.actions:
+                s_ = move(s, action)
+                self.six_away.append(s_)
+                for action_ in self.actions:
+                    self.QV[(s_.__hash__(), action_)] = -1 if action_ != action else 1
             
     # explore
     def QLearn(self, discount=0.99, episodes=10, epsilon=0.9):
         # execute q learning for specified number of episodes
-        self.curr_state = six_move_state()
+        self.curr_state = self.curr_state#six_move_state()
         for i in range(episodes):
             print("=====EPISODE "+str(i)+"=====")
             print("====CURR STATE========")
@@ -194,16 +197,10 @@ class Agent:
         self.last_action = None
         self.curr_state = self.start_state
         print(self.curr_state)
-        #x = six_move_state()
-        #if not self.curr_state.eq(x):
-        #    print("SOMETHING WRONG BRUH")
-        #    return
         for i in range(20):
             best_action = None
             best_QV = -100000000
             if not (self.curr_state.__hash__(), self.actions[0]) in self.QV.keys():
-                print("HMMM")
-                #time.sleep(2)
                 best_action = random.choice(self.actions)
                 while best_action == self.second_last_action or best_action == self.last_action:
                     best_action = random.choice(self.actions)
@@ -283,6 +280,7 @@ class Agent:
     # run based on current policy
 
 agent = Agent()
+print("REGISTERING PATTERN DATABASE, THIS WILL TAKE A LITTLE WHILE")
 agent.register_patterns()
 print(agent.QV)
 Epsilons = [i/ 50 for i in range(50)]
