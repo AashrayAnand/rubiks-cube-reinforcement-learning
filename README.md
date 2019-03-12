@@ -1,6 +1,8 @@
 # Reinforcement Learning: Solving the Rubik's Cube
 
-## The Rubik's cube is a famous logic puzzle, and a unique thought experiment in the realm of artificial intelligence
+### Aashray Anand & Ozan Erdal 
+
+*"A generally intelligent agent must be able to teach itself how to solve problems in complex domains with minimal human supervision." -S. McAleer"*
 
  This project is an attempt to represent and solve the classic Rubik's cube
 
