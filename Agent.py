@@ -1,7 +1,7 @@
 import random, time
-from puzzle import State, move, num_solved_sides, num_pieces_correct_side, shuffle, ten_move_state, one_move_state
+from puzzle import State, move, num_solved_sides, num_pieces_correct_side, shuffle, six_move_state, one_move_state
 
-ALPHA = 0.3
+ALPHA = 0.5
 
     # q-values key = (state, action) => value = (q-value, update_count)
 class Agent:
@@ -11,17 +11,19 @@ class Agent:
     # cube if not provided one
     def __init__(self, QValues=None, cube=None):
         self.visited = []
+        self.visit_count = {}
         self.revisits = 0
-        self.ordered_quality = []
         # maps a state action pair to a Q-Value, and an update count for that Q-Value
         self.QV = QValues if QValues is not None else {}
         # maps a state to a list of rewards for executing each possible outcome
         # can index list of rewards using directional class constants
         self.R = {}
         # create or store initial cube state, and store list of actions
-        self.start_state = cube if cube is not None else one_move_state() #ten_move_state()
+        self.start_state = cube if cube is not None else six_move_state() #six_move_state()
+        print(self.start_state)
+        time.sleep(5)
         # shuffle initially solved starting state, executing 5 random moves
-        self.start_state = shuffle(self.start_state)
+        # self.start_state = shuffle(self.start_state)
         # store the current state
         self.curr_state = self.start_state
         self.prev_state = None
@@ -35,10 +37,6 @@ class Agent:
         # execute q learning for specified number of episodes
         self.curr_state = self.start_state
         for i in range(episodes):
-            if not self.curr_state.__sides__ in self.visited:
-                self.visited.append(self.curr_state.__sides__)
-            else:
-                print("revisited state at episode " + str(i))
             print("=====EPISODE "+str(i)+"=====")
             print("====CURR STATE========")
             print("======================")
@@ -48,6 +46,11 @@ class Agent:
             saved_rewards = self.curr_state.__hash__() in self.R.keys()
             if not saved_rewards:
                 self.R[self.curr_state.__hash__()] = []
+            if not self.curr_state.__hash__ in self.visit_count:
+                self.visit_count[self.curr_state.__hash__()] = 1
+            else:
+                self.visit_count[self.curr_state.__hash__()] += 1
+            vc = self.visit_count[self.curr_state.__hash__()]
             # initialize Q-Values of 0 for all state action pairs
             # for the given, state, if they do not exist
             for action in self.actions:
@@ -57,7 +60,7 @@ class Agent:
                     self.revisits += 1
                     break
                 if not saved_rewards:
-                    self.R[self.curr_state.__hash__()].append(self.reward(action))
+                    self.R[self.curr_state.__hash__()].append(self.reward(self.curr_state, action))
             follow_policy = random.uniform(0,1.0)
             print("random value generated is " + str(follow_policy))
             # if random number is > epsilon, we must select best move
@@ -81,12 +84,17 @@ class Agent:
                 # update Q-Value for current state and action chosen based on the current policy, by taking original Q-value, and adding
                 # alpha times the reward value of the new state plus the discounted max_reward of executing every possible
                 # action on the new state, minus the original Q-Value
-                reward = self.reward(best_action)
-                max_reward = self.max_reward(self.curr_state, best_action)
-                self.QV[(self.curr_state.__hash__(), best_action)] = best_QV + ALPHA*(reward +\
-                                                         discount*max_reward - best_QV)
+                #reward = self.reward(self.curr_state, best_action)
+                #max_reward = self.max_reward(self.curr_state, best_action)
+                #self.QV[(self.curr_state.__hash__(), best_action)] = best_QV + ALPHA*(reward +\
+                #                                         discount*max_reward - best_QV)
+                for action in self.actions:
+                    curr_QV = self.QV[(self.curr_state.__hash__(), action)]
+                    reward = self.reward(self.curr_state, action)
+                    max_reward = self.max_reward(self.curr_state, action)
+                    self.QV[(self.curr_state.__hash__(), action)] = curr_QV + ALPHA*(reward +\
+                                                         (discount**vc)*max_reward - curr_QV)
                 print("new q value for " + best_action + " action is " + str(self.QV[(self.curr_state.__hash__(), best_action)]))
-                self.ordered_quality.append((self.QV[(self.curr_state.__hash__(), best_action)], self.curr_state))
                 self.curr_state.move(best_action)
                 self.curr_state = self.curr_state.copy()
                 if self.curr_state.isGoalState():
@@ -95,26 +103,29 @@ class Agent:
                     return
                 self.second_last_action = self.last_action  
                 self.last_action = best_action
-                #self.ordered_quality.put((self.QV[(self.curr_state, best_action)], str(self.curr_state)))
             else:
                 # pick random move
                 action = random.choice(self.actions)
                 self.move[action] = self.move[action] + 1
                 while action == self.last_action:
                     action = random.choice(self.actions)
-                curr_QV = self.QV[(self.curr_state.__hash__(), action)]
                 # update Q-Value for current state and randomly chosen action, by taking original Q-value, and adding
                 # alpha times the reward value of the new state plus the discounted max_reward of executing every possible
                 # action on the new state, minus the original Q-Value
-                reward = self.reward(action)
-                max_reward = self.max_reward(self.curr_state, action)
-                print("max reward... " + str(max_reward))
-                print("reward... " + str(reward))
-                self.QV[(self.curr_state.__hash__(), action)] = curr_QV + ALPHA*(reward +\
-                                                    discount*max_reward - curr_QV)
+                #reward = self.reward(self.curr_state, action)
+                #max_reward = self.max_reward(self.curr_state, action)
+                #print("max reward... " + str(max_reward))
+                #print("reward... " + str(reward))
+                #self.QV[(self.curr_state.__hash__(), action)] = curr_QV + ALPHA*(reward +\
+                #                                    discount*max_reward - curr_QV)
+                for action in self.actions:
+                    curr_QV = self.QV[(self.curr_state.__hash__(), action)]
+                    reward = self.reward(self.curr_state, action)
+                    max_reward = self.max_reward(self.curr_state, action)
+                    self.QV[(self.curr_state.__hash__(), action)] = curr_QV + ALPHA*(reward +\
+                                                         (discount**vc)*max_reward - curr_QV)
                 #print(self.reward(self.curr_state,action))
                 #print(self.QV[(self.curr_state,action)])
-                self.ordered_quality.append((self.QV[(self.curr_state.__hash__(), action)], self.curr_state))
                 self.curr_state.move(action)
                 self.curr_state = self.curr_state.copy()
                 self.second_last_action = self.last_action  
@@ -122,7 +133,7 @@ class Agent:
 
     def Play(self):
         self.curr_state = self.start_state
-        for i in range(1000):
+        for i in range(10):
             best_action = None
             best_QV = -100000000
             if not (self.curr_state.__hash__(), self.actions[0]) in self.QV.keys():
@@ -142,13 +153,13 @@ class Agent:
                     while best_action == self.last_action or best_action == self.second_last_action:
                         best_action = random.choice(self.actions)
             print("actions chosen = " + best_action)
+            print("last action = " + self.last_action)
             print("q value is " + str(self.QV[(self.curr_state.__hash__(), best_action)]))
-            time.sleep(2)
+            time.sleep(1)
             self.curr_state.move(action)
-            self.second_last_action = self.last_action
-            self.last_action = action
+            self.last_action = best_action
             print(self.curr_state)
-            if(self.curr_state.isGoalState()):
+            if self.curr_state.isGoalState():
                 print("HOLY SHIT")
                 time.sleep(5)
                 return
@@ -158,10 +169,6 @@ class Agent:
         print("=============")
         x = 0
         y = 0
-        #for i in range(10):
-            #print(self.ordered_quality[i][0])
-            #print(self.ordered_quality[i][1])
-            #print(len(self.QV))
         for key in self.QV.keys():
             if self.QV[key] != 0:
                 x += 1
@@ -178,15 +185,17 @@ class Agent:
         print(values)
         print(self.move)
             
-    def reward(self, action):
+    def reward(self, state, action):
         # this reward function should be a function approximation made up of 
         # a set of features, these features should be in decreasing order of priority:
         # 1. solved sides ()
         # use next state to get value for next state vs. self.curr_state, to determine
         # if feature values should be 1 or 0, e.g. if solved_sides(next_state) > solved_sides(self.curr_state)
         # then the solved sides feature is 1, else 0
-        next_state = move(self.curr_state, action)
+        next_state = move(state, action)
         if next_state.isGoalState():
+            print(state)
+            print(next_state)
             print("REWARD IS GOAL")
             time.sleep(3)
             return 100
@@ -202,18 +211,17 @@ class Agent:
         if not new_state in self.R.keys():
             self.R[new_state] = []
             for action in self.actions:
-                self.R[new_state].append(self.reward(action))
+                self.R[new_state].append(self.reward(new_state, action))
         return max(self.R[new_state])
     # execute Q-value iteration
 
     # run based on current policy
 
 agent = Agent()
-for i in range(1000):
+for i in range(100):
     print("======= ROUND " + str(i) + "=========")
-    time.sleep(.1)
     agent.QLearn()
 print("there are " + str(len(agent.QV)) + " keys in Q Table")
 #agent.QLearn(epsilon=0.1)
-#agent.Play()
+agent.Play()
 agent.printQV()
