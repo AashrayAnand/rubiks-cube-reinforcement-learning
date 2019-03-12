@@ -31,7 +31,7 @@ class Agent:
         self.move = {"front": 0, "back": 0, "left": 0, "right": 0, "top": 0, "bottom": 0}
 
     # explore
-    def QLearn(self, discount=0.99, episodes=20, epsilon=0.9):
+    def QLearn(self, discount=0.99, episodes=5, epsilon=0.9):
         # execute q learning for specified number of episodes
         self.curr_state = self.start_state
         for i in range(episodes):
@@ -89,6 +89,10 @@ class Agent:
                 self.ordered_quality.append((self.QV[(self.curr_state.__hash__(), best_action)], self.curr_state))
                 self.curr_state.move(best_action)
                 self.curr_state = self.curr_state.copy()
+                if self.curr_state.isGoalState():
+                    print("reached goal state while in Q-learning epsiode " + str(i))
+                    time.sleep(2)
+                    return
                 self.second_last_action = self.last_action  
                 self.last_action = best_action
                 #self.ordered_quality.put((self.QV[(self.curr_state, best_action)], str(self.curr_state)))
@@ -205,11 +209,11 @@ class Agent:
     # run based on current policy
 
 agent = Agent()
-for i in range(500):
+for i in range(1000):
     print("======= ROUND " + str(i) + "=========")
-    time.sleep(1)
+    time.sleep(.1)
     agent.QLearn()
 print("there are " + str(len(agent.QV)) + " keys in Q Table")
 #agent.QLearn(epsilon=0.1)
-agent.Play()
+#agent.Play()
 agent.printQV()
