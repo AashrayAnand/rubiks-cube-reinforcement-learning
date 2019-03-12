@@ -338,13 +338,13 @@ import random
 
 def six_move_state():
     c = State()
-    c.move(c.actions[0])
+    '''c.move(c.actions[0])
     c.move(c.actions[1])
-    c.move(c.actions[2])
+    c.move(c.actions[1])
     c.move(c.actions[3])
     c.move(c.actions[4])
-    c.move(c.actions[5])
-    return c
+    c.move(c.actions[5])'''
+    return shuffle(c, n=5)
 
 def one_move_state():
     c = State()
@@ -353,7 +353,7 @@ def one_move_state():
 
 def shuffle(cube, n=5):
     new_cube = cube.copy()
-    for _ in range(5):
+    for _ in range(n):
         new_cube = random_move(new_cube)
     return new_cube
 
