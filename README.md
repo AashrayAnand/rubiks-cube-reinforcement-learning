@@ -19,11 +19,14 @@ that are used elsewhere in the application
 > **Agent.py** includes the implementation of a reinforcement learning agent, which executes iterations of Q-Learning, and additionally uses a pattern database, to build up a Q-Table, which is used to eventually try to solve the given random Rubik's cube
 
 ### Using this project
-` clone the repository and verify you have python3 installed `
+
+clone the repository and verify you have python3 installed 
+
 ` python Agent.py (will run Q-Learning on a n=5 scrambled cube, and attempt to solve it) `
 
-` to change the number of moves to apply to the initial cube, change n=5 to any value on the below line in Agent.py `
-` 22    self.start_state = cube if cube is not None else n_move_state(n=6) `
+to change the number of moves to apply to the initial cube, change **n=5** to any value on the below line in Agent.py
+
+` 22    self.start_state = cube if cube is not None else n_move_state(n=5) `
 
 ### References:
 
